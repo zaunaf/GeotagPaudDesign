@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2012                    */
-/* Created on:     27/09/2019 15.50.30                          */
+/* Created on:     07/10/2019 21.17.22                          */
 /*==============================================================*/
 
 
@@ -140,14 +140,46 @@ if exists (select 1
    drop table ref.status_geotag
 go
 
-IF EXISTS (SELECT name FROM sys.schemas WHERE name = N'ref')
-    drop schema  ref
+if exists(select 1 from systypes where name='id')
+   drop type id
+go
+
+if exists(select 1 from systypes where name='nama_obyek_panjang')
+   drop type nama_obyek_panjang
+go
+
+if exists(select 1 from systypes where name='serial')
+   drop type serial
+go
+
+drop schema ref
 go
 
 /*==============================================================*/
 /* User: ref                                                    */
 /*==============================================================*/
 create schema ref
+go
+
+/*==============================================================*/
+/* Domain: id                                                   */
+/*==============================================================*/
+create type id
+   from uniqueidentifier
+go
+
+/*==============================================================*/
+/* Domain: nama_obyek_panjang                                   */
+/*==============================================================*/
+create type nama_obyek_panjang
+   from varchar(140)
+go
+
+/*==============================================================*/
+/* Domain: serial                                               */
+/*==============================================================*/
+create type serial
+   from int
 go
 
 /*==============================================================*/
@@ -166,6 +198,7 @@ create table foto (
    lintang              numeric(11,7)        null,
    bujur                numeric(11,7)        null,
    tgl_pengiriman       datetime             null,
+   status_data          smallint             null,
    constraint PK_FOTO primary key nonclustered (foto_id)
 )
 go
@@ -200,7 +233,7 @@ create table geotag (
    petugas_link         uniqueidentifier     null,
    sekolah_link         uniqueidentifier     null,
    tgl_pengiriman       datetime             null,
-   status_tag           smallint             null,
+   status_data          smallint             null,
    constraint PK_GEOTAG primary key nonclustered (geotag_id)
 )
 go
@@ -259,10 +292,10 @@ create table pengguna (
    dudi_id              varchar(36)          null,
    create_date          datetime             not null,
    roles                text                 null,
-   last_update          datetime             not null,
-   soft_delete          numeric(1)           not null,
-   last_sync            datetime             not null,
-   updater_id           varchar(36)          not null,
+   last_update          datetime             null,
+   soft_delete          numeric(1)           null,
+   last_sync            datetime             null,
+   updater_id           varchar(36)          null,
    constraint PK_PENGGUNA primary key nonclustered (pengguna_id)
 )
 go
@@ -317,11 +350,11 @@ create table sekolah (
    npwp                 char(15)             collate SQL_Latin1_General_CP1_CI_AS null,
    nm_wp                varchar(100)         collate SQL_Latin1_General_CP1_CI_AS null,
    flag                 char(3)              collate SQL_Latin1_General_CP1_CI_AS null,
-   create_date          datetime             not null,
-   last_update          datetime             not null,
-   soft_delete          numeric(1)           not null,
-   last_sync            datetime             not null,
-   updater_id           varchar(36)          not null,
+   create_date          datetime             null,
+   last_update          datetime             null,
+   soft_delete          numeric(1)           null,
+   last_sync            datetime             null,
+   updater_id           varchar(36)          null,
    constraint PK_SEKOLAH primary key nonclustered (sekolah_id)
 )
 go
@@ -331,7 +364,7 @@ go
 /*==============================================================*/
 create table ref.status_geotag (
    status_geotag_id     smallint             not null,
-   nama_status_geotag   varchar(20)          null,
+   nama_status_geotag   varchar(80)          null,
    constraint PK_STATUS_GEOTAG primary key nonclustered (status_geotag_id)
 )
 go
